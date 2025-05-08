@@ -4,22 +4,23 @@
  * Description: Plugin to synchronize Klaro Cards cards with Wordpress.
  */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
+if (!defined('ABSPATH')) exit;
 
-require_once plugin_dir_path(__FILE__) . 'includes/admin-page.php';
+add_action('admin_head-edit.php', 'add_retrieve_button');
 
-function klarocard_sync_page()
+function add_retrieve_button()
 {
-    add_menu_page(
-        'Klaro Cards Sync',       // Titre de la page
-        'Klaro Cards Sync',       // Texte à afficher dans le menu
-        'manage_options',          // Capacité requise pour accéder à la page
-        'klarocard-sync',          // Slug de la page
-        'klarocard_sync_page_content', // Fonction pour afficher le contenu de la page
-        'dashicons-admin-generic', // Icône du menu
-        6                          // Position dans le menu
-    );
+    // checking if the script is called on the post admin page
+    $screen = get_current_screen();
+    if ($screen->post_type !== 'post') return;
+
+    // script to place the "Récupérer les cartes" button next to the "Add Post" button using jQuery
+?>
+    <script type="text/javascript">
+        jQuery(function() {
+            // we're using the fact that the header of the page ends with a hr element with class "wp-header-end"
+            jQuery('hr.wp-header-end').before('<a class="button-primary" style="transform: translateY(-3px); margin-inline-start: 4px;">Récupérer les cartes</a>');
+        });
+    </script>
+<?php
 }
-add_action('admin_menu', 'klarocard_sync_page');
