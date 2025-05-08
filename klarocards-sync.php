@@ -6,6 +6,21 @@
 
 if (!defined('ABSPATH')) exit;
 
+// Adding plugin options to the database
+register_activation_hook( __FILE__, 'kcs_add_options' );
+
+function kcs_add_options() {
+    add_option('kcs_api_url', '');
+}
+
+// Removing plugin options to the wp_options database
+register_deactivation_hook( __FILE__, 'kcs_remove_options' );
+
+function kcs_remove_options() {
+    delete_option( 'kcs_api_url' );
+}
+
+// Adding a custom button on the post admin page
 add_action('admin_head-edit.php', 'add_retrieve_button');
 
 function add_retrieve_button()
