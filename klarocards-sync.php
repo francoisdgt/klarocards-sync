@@ -2,29 +2,18 @@
 /*
  * Plugin Name: Klaro Cards Sync
  * Description: Plugin to synchronize Klaro Cards cards with Wordpress.
+ * Version: 0.3.0
  */
 
 if (!defined('ABSPATH')) exit;
 
-require_once plugin_dir_path(__FILE__) . 'includes/options-page.php';
+// imports
+require_once plugin_dir_path(__FILE__) . 'includes/kcsync-options-page.php';
+require_once plugin_dir_path(__FILE__) . 'includes/kcsync-settings.php';
 
-// Adding plugin options to the database
-register_activation_hook(__FILE__, 'kcsync_add_options');
+register_deactivation_hook(__FILE__, 'kcsync_deactivate');
 
-function kcsync_add_options()
-{
-    add_option('kcsync_api_url', '');
-}
-
-// Removing plugin options to the wp_options database
-register_deactivation_hook(__FILE__, 'kcsync_remove_options');
-
-function kcsync_remove_options()
-{
-    delete_option('kcsync_api_url');
-}
-
-// Adding a custom button on the post admin page
+// adding a custom button on the post admin page
 add_action('admin_head-edit.php', 'add_retrieve_button');
 
 function add_retrieve_button()
