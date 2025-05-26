@@ -2,7 +2,8 @@
 /*
  * Plugin Name: Klaro Cards Sync
  * Description: Plugin to synchronize Klaro Cards cards with Wordpress.
- * Version: 0.3.0
+ * Version: 0.4.0
+ * License: GPL v2 or later
  */
 
 if (!defined('ABSPATH')) exit;
