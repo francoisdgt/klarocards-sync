@@ -2,16 +2,18 @@
 /*
  * Plugin Name: Klaro Cards Sync
  * Description: Plugin to synchronize Klaro Cards cards with Wordpress.
- * Version: 0.4.1
+ * Version: 0.4.2
  * License: GPL v2 or later
  */
 
 if (!defined('ABSPATH')) exit;
 
+// composer autoload
+require_once __DIR__ . '/vendor/autoload.php';
+
 // imports
 require_once plugin_dir_path(__FILE__) . 'includes/kcsync-options-page.php';
 require_once plugin_dir_path(__FILE__) . 'includes/kcsync-settings.php';
-require_once __DIR__ . '/vendor/autoload.php';
 
 // Enqueueing scripts
 function kcsync_enqueue_admin_scripts($hook) {
@@ -27,10 +29,10 @@ function kcsync_enqueue_admin_scripts($hook) {
         true
     );
 
-    // passing a nonce to the script for security
+    // Localizing script
     wp_localize_script('kcsync_sync_stories', 'kcsync_ajax_data', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('kcsync_sync_' . get_current_user_id())
+        'nonce' => wp_create_nonce('kcsync_sync_' . get_current_user_id()) // passing a nonce to the script for security
     ));
 }
 

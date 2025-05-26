@@ -2,6 +2,19 @@
 
 if (!defined('ABSPATH')) exit;
 
+function kcsync_options_page()
+{
+    // adding a submenu to the option page
+    add_management_page(
+        'Klaro Cards Sync Options',
+        'KC Sync Options',
+        'manage_options',
+        'kcsync_settings',
+        'kcsync_options_page_html',
+        3 // position 3 in the option menu
+    );
+}
+
 // Admin page HTML
 function kcsync_options_page_html()
 {
@@ -23,16 +36,3 @@ function kcsync_options_page_html()
 
 // Adding the admin page to the Tools menu in WP admin
 add_action('admin_menu', 'kcsync_options_page');
-
-function kcsync_options_page()
-{
-    // adding a submenu to the option page
-    add_management_page(
-        'Klaro Cards Sync Options',
-        'KC Sync Options',
-        'manage_options',
-        'kcsync_settings',
-        'kcsync_options_page_html',
-        3 // position 3 in the option menu
-    );
-}

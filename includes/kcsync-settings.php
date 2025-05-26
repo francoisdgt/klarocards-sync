@@ -45,7 +45,7 @@ function kcsync_settings_init()
     register_setting('kcsync_settings', 'kcsync_api_key'); // defining kcsync_api_key setting in the general settings group
 }
 
-add_action('admin_init', 'kcsync_settings_init');
+add_action('admin_init', 'kcsync_settings_init'); // adding callback to the admin_init hook
 
 // Callback functions
 function kcsync_general_section_callback()
