@@ -40,7 +40,11 @@ function kcsync_settings_init()
         'kcsync_general_section'
     );
 
-    register_setting('kcsync_settings', 'kcsync_api_url'); // defining kcsync_api_url setting in the general settings group
+    $url_args = array(
+        'sanitize_callback' => 'sanitize_api_url'
+    );
+
+    register_setting('kcsync_settings', 'kcsync_api_url', $url_args); // defining kcsync_api_url setting in the general settings group
     register_setting('kcsync_settings', 'kcsync_board_name'); // defining kcsync_board_name setting in the general settings group
     register_setting('kcsync_settings', 'kcsync_api_key'); // defining kcsync_api_key setting in the general settings group
 }
@@ -53,6 +57,17 @@ function kcsync_general_section_callback()
     echo '<p>Paramètres généraux du plugin Klaro Cards Sync</p>'; // adding the section descrpition
 }
 
+function sanitize_api_url($api_url) {
+    $sanitized_url = sanitize_url($api_url); // sanitizing url
+
+    // if the url ends with a / we remove it
+    if ($sanitized_url[-1] === '/') {
+        return substr($api_url, 0, -1);
+    }
+
+    return $sanitized_url;
+}
+
 function kcsync_api_url_callback()
 {
     $setting = get_option('kcsync_api_url'); // getting the kcsync_api_url setting
@@ -61,8 +76,9 @@ function kcsync_api_url_callback()
     <input
         type="text" name="kcsync_api_url"
         value="<?php echo isset($setting) ? esc_attr($setting) : ''; // if $setting not null then value = $setting, if null value = ''
-                ?>">
-    <p class="description">L'URL doit être au format suivant : https://yourproject.klaro.cards/api/v1/</p>
+                ?>"
+        pattern="https:\/\/[^ ]+">
+    <p class="description">L'URL doit être au format suivant : https://yourproject.klaro.cards</p>
 <?php
 }
 

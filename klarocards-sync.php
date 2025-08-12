@@ -39,6 +39,7 @@ function kcsync_enqueue_admin_scripts($hook) {
 
 add_action('admin_enqueue_scripts', 'kcsync_enqueue_admin_scripts');
 
+// getting the posts from Klaro Cards and creating/updating/deletings posts
 function kcsync_sync_stories() {
     $nonce = 'kcsync_sync_' . get_current_user_id();
 
@@ -56,11 +57,12 @@ function kcsync_sync_stories() {
 
     // data needed for API call
     $api_token = get_option('kcsync_api_key');
-    $api_url = sanitize_url(get_option('kcsync_api_url'));
+    $kc_url = get_option('kcsync_api_url');
+    $api_url = $kc_url . '/api/v1';
     $board_name = get_option('kcsync_board_name');
 
     // getting stories from board
-    $board_url = $api_url . 'boards/' . $board_name . '/stories';
+    $board_url = $api_url . '/boards/' . $board_name . '/stories';
     $board_stories = kcsync_api_call($board_url, $api_token);
 
     // we check if there is any stories
@@ -90,11 +92,16 @@ function kcsync_sync_stories() {
 
         // if the story isn't in the posts we create a post
         if ($posts_count === $i) {
-            $story_url = $api_url . 'stories/' . $board_story['id'];
+            // getting the stories from Klaro Cards
+            $story_url = $api_url . '/stories/' . $board_story['id'];
             $story = kcsync_api_call($story_url, $api_token);
+
+            // isolating the first image to use for the WP post
+            $post_img = $kc_url . $story['attachments'][0]['url'];
+            $post_content = "<img src='$post_img'></img>" . $parsedown->text($story['specification']);
             array_push($new_posts, [
                 'post_title' => $story['title'],
-                'post_content' => $parsedown->text($story['specification']),
+                'post_content' => $post_content,
                 'post_status' => 'publish',
                 'meta_input' => [
                     'story_id' => $board_story['id']
@@ -110,7 +117,7 @@ function kcsync_sync_stories() {
              * Therefore, we should always check that the timezones are matching when manipulating time data.
              */
             if (strtotime($posts[$i]->post_modified_gmt) < strtotime($board_story['updatedAt'])) {
-                $story_url = $api_url . 'stories/' . $board_story['id'];
+                $story_url = $api_url . '/stories/' . $board_story['id'];
                 $story = kcsync_api_call($story_url, $api_token);
                 wp_update_post(array(
                     'ID' => $posts[$i]->ID,
