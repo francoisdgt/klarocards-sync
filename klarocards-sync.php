@@ -49,11 +49,12 @@ function kcsync_sync_stories() {
     }
 
     // checking if the nonce is valid
-    if (!check_ajax_referer($nonce)) {
+    if (!check_ajax_referer($nonce, '_ajax_nonce', false)) {
         wp_send_json_error('Nonce invalide');
     }
 
     $parsedown = new Parsedown();
+    $parsedown->setSafeMode(true);
 
     // data needed for API call
     $api_token = get_option('kcsync_api_key');
@@ -64,6 +65,9 @@ function kcsync_sync_stories() {
     // getting stories from board
     $board_url = $api_url . '/boards/' . $board_name . '/stories';
     $board_stories = kcsync_api_call($board_url, $api_token);
+    if (is_wp_error($board_stories) || !is_array($board_stories)) {
+        wp_send_json_error('Erreur lors de l\'appel à l’API Klaro Cards');
+    }
 
     // we check if there is any stories
     if (count($board_stories) === 0) {
@@ -97,10 +101,15 @@ function kcsync_sync_stories() {
             $story = kcsync_api_call($story_url, $api_token);
 
             // isolating the first image to use for the WP post
-            $post_img = $kc_url . $story['attachments'][0]['url'];
-            $post_content = "<img src='$post_img'></img>" . $parsedown->text($story['specification']);
+            $post_content = '';
+            if (!empty($story['attachments'][0]['url'])) {
+                $post_img = esc_url($kc_url . $story['attachments'][0]['url']);
+                $post_content .= '<img src="' . $post_img . '" />';
+            }
+            $post_content .= $parsedown->text(isset($story['specification']) ? $story['specification'] : '');
+            $post_content = wp_kses_post($post_content);
             array_push($new_posts, [
-                'post_title' => $story['title'],
+                'post_title' => isset($story['title']) ? $story['title'] : '',
                 'post_content' => $post_content,
                 'post_status' => 'publish',
                 'meta_input' => [
@@ -121,8 +130,8 @@ function kcsync_sync_stories() {
                 $story = kcsync_api_call($story_url, $api_token);
                 wp_update_post(array(
                     'ID' => $posts[$i]->ID,
-                    'post_title' => $story['title'],
-                    'post_content' => $parsedown->text($story['specification'])
+                    'post_title' => isset($story['title']) ? $story['title'] : '',
+                    'post_content' => wp_kses_post($parsedown->text(isset($story['specification']) ? $story['specification'] : ''))
                 ));
                 array_splice($posts, $i, 1); // we delete the corresponding post from the array
                 $posts_count = count($posts); // updating the posts' count

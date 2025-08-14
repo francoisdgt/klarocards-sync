@@ -41,12 +41,16 @@ function kcsync_settings_init()
     );
 
     $url_args = array(
-        'sanitize_callback' => 'sanitize_api_url'
+		'sanitize_callback' => 'sanitize_api_url'
     );
 
-    register_setting('kcsync_settings', 'kcsync_api_url', $url_args); // defining kcsync_api_url setting in the general settings group
-    register_setting('kcsync_settings', 'kcsync_board_name'); // defining kcsync_board_name setting in the general settings group
-    register_setting('kcsync_settings', 'kcsync_api_key'); // defining kcsync_api_key setting in the general settings group
+	register_setting('kcsync_settings', 'kcsync_api_url', $url_args); // defining kcsync_api_url setting in the general settings group
+	register_setting('kcsync_settings', 'kcsync_board_name', array(
+		'sanitize_callback' => 'sanitize_text_field'
+	)); // defining kcsync_board_name setting in the general settings group
+	register_setting('kcsync_settings', 'kcsync_api_key', array(
+		'sanitize_callback' => 'sanitize_text_field'
+	)); // defining kcsync_api_key setting in the general settings group
 }
 
 add_action('admin_init', 'kcsync_settings_init'); // adding callback to the admin_init hook
@@ -58,14 +62,11 @@ function kcsync_general_section_callback()
 }
 
 function sanitize_api_url($api_url) {
-    $sanitized_url = sanitize_url($api_url); // sanitizing url
-
-    // if the url ends with a / we remove it
-    if ($sanitized_url[-1] === '/') {
-        return substr($api_url, 0, -1);
-    }
-
-    return $sanitized_url;
+	$sanitized_url = esc_url_raw($api_url);
+	if (empty($sanitized_url)) {
+		return '';
+	}
+	return untrailingslashit($sanitized_url);
 }
 
 function kcsync_api_url_callback()
@@ -88,7 +89,7 @@ function kcsync_api_key_callback()
 ?>
     <!-- setting the input and a description -->
     <input
-        type="text" name="kcsync_api_key"
+		type="password" name="kcsync_api_key"
         value="<?php echo isset($setting) ? esc_attr($setting) : ''; // if $setting not null then value = $setting, if null value = ''
                 ?>">
 <?php
