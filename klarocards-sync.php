@@ -99,6 +99,14 @@ function kcsync_sync_stories() {
             // getting the stories from Klaro Cards
             $story_url = $api_url . '/stories/' . $board_story['id'];
             $story = kcsync_api_call($story_url, $api_token);
+            
+            // Vérification de l'erreur API pour la création
+            if (is_wp_error($story)) {
+                wp_send_json_error('Erreur lors de la récupération de la carte ' . $board_story['id'] . ' : ' . $story->get_error_message());
+            }
+            if (!is_array($story)) {
+                wp_send_json_error('Données invalides reçues pour la carte ' . $board_story['id']);
+            }
 
             // isolating the first image to use for the WP post
             $post_content = '';
@@ -128,6 +136,15 @@ function kcsync_sync_stories() {
             if (strtotime($posts[$i]->post_modified_gmt) < strtotime($board_story['updatedAt'])) {
                 $story_url = $api_url . '/stories/' . $board_story['id'];
                 $story = kcsync_api_call($story_url, $api_token);
+                
+                // Vérification de l'erreur API pour la mise à jour
+                if (is_wp_error($story)) {
+                    wp_send_json_error('Erreur lors de la récupération de la carte ' . $board_story['id'] . ' : ' . $story->get_error_message());
+                }
+                if (!is_array($story)) {
+                    wp_send_json_error('Données invalides reçues pour la carte ' . $board_story['id']);
+                }
+                
                 wp_update_post(array(
                     'ID' => $posts[$i]->ID,
                     'post_title' => isset($story['title']) ? $story['title'] : '',
