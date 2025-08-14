@@ -6,6 +6,14 @@ jQuery(function ($) {
 
   $("#retrieve-cards-btn").on("click", function (e) {
     e.preventDefault(); // prevent button default action
+    
+    const $btn = $(this);
+    const originalText = $btn.text();
+    
+    // Désactiver le bouton et montrer l'état de chargement
+    $btn.prop('disabled', true)
+        .text('Synchronisation en cours...')
+        .addClass('updating-message');
 
     $.post( // ajax request
       kcsync_ajax_data.ajaxurl,
@@ -15,12 +23,48 @@ jQuery(function ($) {
       },
       function (response) {
         if (response.success) {
-          alert("Article crée avec succès !");
-          location.reload(); // releoding the page
+          // Succès - montrer un message de confirmation
+          $btn.removeClass('updating-message')
+              .addClass('updated-message')
+              .text('Synchronisation réussie !');
+          
+          // Message de succès plus informatif
+          const successMessage = response.data || 'Synchronisation terminée avec succès !';
+          
+          // Créer une notification WordPress-style
+          const notice = $('<div class="notice notice-success is-dismissible"><p>' + successMessage + '</p></div>');
+          $('#retrieve-cards-btn').after(notice);
+          
+          // Recharger la page après un délai pour laisser l'utilisateur voir le message
+          setTimeout(function() {
+            location.reload();
+          }, 2000);
+          
         } else {
-          alert("Erreur : " + response.data);
+          // Erreur - restaurer le bouton et montrer l'erreur
+          $btn.prop('disabled', false)
+              .removeClass('updating-message')
+              .text(originalText);
+          
+          // Message d'erreur plus informatif
+          const errorMessage = response.data || 'Une erreur est survenue lors de la synchronisation.';
+          
+          // Créer une notification d'erreur WordPress-style sous les boutons
+          const notice = $('<div class="notice notice-error is-dismissible"><p><strong>Erreur :</strong> ' + errorMessage + '</p></div>');
+          $('#retrieve-cards-btn').after(notice);
         }
       }
-    );
+    ).fail(function(xhr, status, error) {
+      // Gestion des erreurs AJAX (réseau, timeout, etc.)
+      $btn.prop('disabled', false)
+          .removeClass('updating-message')
+          .text(originalText);
+      
+      const errorMessage = 'Erreur de connexion : ' + (error || 'Problème réseau détecté');
+      
+      // Créer une notification d'erreur WordPress-style sous les boutons
+      const notice = $('<div class="notice notice-error is-dismissible"><p><strong>Erreur réseau :</strong> ' + errorMessage + '</p></div>');
+      $('#retrieve-cards-btn').after(notice);
+    });
   });
 });
