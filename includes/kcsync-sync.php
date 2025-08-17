@@ -247,14 +247,17 @@ function kcsync_update_existing_post($board_story, $wp_post, $config, $parsedown
     // Build updated content
     $post_content = kcsync_build_post_content($story, $config, $parsedown);
 
-    $post_category = get_category_by_slug($story['card-kind']);
-    error_log($post_category->name);
+    // Get WordPress category using slug from Klaro Cards story
+    $post_category = kcsync_get_category_by_card_kind($story['card-kind']);
+
+    error_log("Klaro Cards Sync: Category {$post_category->name} ({$post_category->slug})");
     
     // Update post
     $update_result = wp_update_post(array(
         'ID' => $wp_post->ID,
         'post_title' => isset($story['title']) ? $story['title'] : '',
-        'post_content' => $post_content
+        'post_content' => $post_content,
+        'post_category' => array($post_category->term_id)
     ));
     
     if (is_wp_error($update_result)) {
@@ -291,11 +294,15 @@ function kcsync_prepare_new_post($board_story, $config, $parsedown) {
     
     // Build post content
     $post_content = kcsync_build_post_content($story, $config, $parsedown);
+
+    // Get WordPress category using slug from Klaro Cards story
+    $post_category = kcsync_get_category_by_card_kind($story['card-kind']);
     
     $new_post_data = array(
         'post_title' => isset($story['title']) ? $story['title'] : '',
         'post_content' => $post_content,
         'post_status' => 'publish',
+        'post_category' => array($post_category->term_id),
         'meta_input' => array(
             'story_id' => $board_story['id']
         )
@@ -429,4 +436,41 @@ function kcsync_build_sync_summary($sync_results, $cleanup_results, $creation_re
     error_log("Klaro Cards Sync: " . $summary);
     
     return $summary;
+}
+
+function kcsync_get_category_by_card_kind($card_kind) {
+    if (empty($card_kind)) {
+        error_log("Klaro Cards Sync: card-kind empty");
+        return kcsync_get_default_category();
+    }
+
+    $category = get_category_by_slug($card_kind);
+
+    if (!$category) {
+        error_log("Klaro Cards Sync: category not found");
+        return kcsync_get_default_category();
+    }
+
+    $allowed_categories = array('Projets', 'Blog', 'Ateliers', 'Services');
+    if (!in_array($category->name, $allowed_categories)) {
+        error_log("Klaro Cards Sync: category not allowed");
+        return kcsync_get_default_category();
+    }
+
+    error_log("Klaro Cards Sync: category found");
+    return $category;
+}
+
+function kcsync_get_default_category() {
+    $default_category = get_category_by_slug('non-classe');
+
+    if (!$default_category) {
+        $default_category = wp_create_category('non-classe');
+        if (is_wp_error($default_category)) {
+            error_log("Klaro Cards Sync: default category not created");
+            return null;
+        }
+    }
+
+    return $default_category;
 }
