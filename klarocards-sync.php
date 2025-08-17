@@ -29,7 +29,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/kcsync-sync.php';
  */
 function kcsync_activate() {
     // Create categories if they don't exist
-    $categories = ['Projets', 'Blogs', 'Ateliers', 'Services'];
+    $categories = ['Projets', 'Blog', 'Ateliers', 'Services'];
     wp_create_categories($categories);
 }
 
