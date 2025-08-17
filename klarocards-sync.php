@@ -25,6 +25,15 @@ require_once plugin_dir_path(__FILE__) . 'includes/kcsync-settings.php';
 require_once plugin_dir_path(__FILE__) . 'includes/kcsync-sync.php';
 
 /**
+ * Activation hook
+ */
+function kcsync_activate() {
+    // Create categories if they don't exist
+    $categories = ['Projets', 'Blogs', 'Ateliers', 'Services'];
+    wp_create_categories($categories);
+}
+
+/**
  * Enqueue admin scripts for post management pages
  * 
  * @param string $hook Current page hook
@@ -49,6 +58,9 @@ function kcsync_enqueue_admin_scripts($hook) {
         'nonce' => wp_create_nonce('kcsync_sync_' . get_current_user_id()) // Security nonce
     ));
 }
+
+// Activation hook
+register_activation_hook(__FILE__, 'kcsync_activate');
 
 // Hook for enqueuing admin scripts
 add_action('admin_enqueue_scripts', 'kcsync_enqueue_admin_scripts');

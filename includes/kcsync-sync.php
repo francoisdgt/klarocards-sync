@@ -76,7 +76,7 @@ function kcsync_sync_stories() {
     $sync_results = kcsync_process_stories($board_stories, $story_id_to_post, $config, $parsedown);
     
     // Clean up orphaned posts (stories deleted from board)
-    $cleanup_results = kcsync_cleanup_orphaned_posts($story_id_to_post, $board_stories);
+    $cleanup_results = kcsync_cleanup_orphaned_posts($story_id_to_post, $board_stories, $sync_results['board_story_ids']);
     
     // Create new posts for stories that don't exist yet
     $creation_results = kcsync_create_new_posts($sync_results['new_posts']);
@@ -246,6 +246,9 @@ function kcsync_update_existing_post($board_story, $wp_post, $config, $parsedown
     
     // Build updated content
     $post_content = kcsync_build_post_content($story, $config, $parsedown);
+
+    $post_category = get_category_by_slug($story['card-kind']);
+    error_log($post_category->name);
     
     // Update post
     $update_result = wp_update_post(array(
@@ -337,16 +340,8 @@ function kcsync_build_post_content($story, $config, $parsedown) {
  * @param array $board_stories Stories currently on board
  * @return array Cleanup results
  */
-function kcsync_cleanup_orphaned_posts($story_id_to_post, $board_stories) {
+function kcsync_cleanup_orphaned_posts($story_id_to_post, $board_stories, $board_story_ids) {
     $deleted_posts = array();
-    $board_story_ids = array();
-    
-    // Build list of story IDs currently on board
-    foreach ($board_stories as $story) {
-        if (isset($story['id'])) {
-            $board_story_ids[$story['id']] = true;
-        }
-    }
     
     // Identify and delete orphaned posts
     foreach ($story_id_to_post as $story_id => $post) {
