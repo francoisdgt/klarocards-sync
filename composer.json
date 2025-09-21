@@ -1,20 +1,20 @@
 {
-    "name": "howeb/klarocards-sync",
-    "description": "Plugin to synchronize Klaro Cards cards with Wordpress.",
-    "type": "wordpress-plugin",
-    "require": {
-        "erusev/parsedown": "^1.7"
+  "name": "howeb/klarocards-sync",
+  "description": "Plugin to synchronize Klaro Cards cards with Wordpress.",
+  "type": "wordpress-plugin",
+  "require": {
+    "erusev/parsedown": "^1.7"
+  },
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "François Dangotte",
+      "email": "francois@hoyo.be"
     },
-    "license": "GPL-2.0-or-later",
-    "authors": [
-        {
-            "name": "François Dangotte",
-            "email": "francois@hoyo.be"
-        },
-        {
-            "name": "Hugo Torres",
-            "email": "mail@hugotorres.me"
-        }
-    ],
-    "version": "0.6.0"
+    {
+      "name": "Hugo Torres",
+      "email": "mail@hugotorres.me"
+    }
+  ],
+  "version": "0.7.0"
 }
