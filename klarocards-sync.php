@@ -28,10 +28,11 @@ require_once plugin_dir_path(__FILE__) . 'includes/kcsync-handle-attachments.php
 /**
  * Activation hook
  */
-function kcsync_activate() {
-    // Create categories if they don't exist
-    $categories = ['Projets', 'Blog', 'Ateliers', 'Services'];
-    wp_create_categories($categories);
+function kcsync_activate()
+{
+  // Create categories if they don't exist
+  $categories = ['Projets', 'Blog', 'Ateliers', 'Services'];
+  wp_create_categories($categories);
 }
 
 /**
@@ -39,25 +40,26 @@ function kcsync_activate() {
  *
  * @param string $hook Current page hook
  */
-function kcsync_enqueue_admin_scripts($hook) {
-    // Check if we're on a post management page
-    $screen = get_current_screen();
-    if ($screen && $screen->post_type !== 'post') return;
+function kcsync_enqueue_admin_scripts($hook)
+{
+  // Check if we're on a post management page
+  $screen = get_current_screen();
+  if ($screen && $screen->post_type !== 'post') return;
 
-    // Enqueue synchronization script
-    wp_enqueue_script(
-        'kcsync_sync_stories',
-        plugins_url('/assets/js/kcsync-sync-stories.js', __FILE__),
-        array('jquery'), // Dependencies
-        '0.6.0', // Script version
-        true // Load in footer
-    );
+  // Enqueue synchronization script
+  wp_enqueue_script(
+    'kcsync_sync_stories',
+    plugins_url('/assets/js/kcsync-sync-stories.js', __FILE__),
+    array('jquery'), // Dependencies
+    '0.7.0', // Script version
+    true // Load in footer
+  );
 
-    // Localize script with AJAX data
-    wp_localize_script('kcsync_sync_stories', 'kcsync_ajax_data', array(
-        'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('kcsync_sync_' . get_current_user_id()) // Security nonce
-    ));
+  // Localize script with AJAX data
+  wp_localize_script('kcsync_sync_stories', 'kcsync_ajax_data', array(
+    'ajaxurl' => admin_url('admin-ajax.php'),
+    'nonce' => wp_create_nonce('kcsync_sync_' . get_current_user_id()) // Security nonce
+  ));
 }
 
 // Activation hook
