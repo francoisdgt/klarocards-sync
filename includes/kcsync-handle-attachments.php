@@ -85,11 +85,10 @@ function kcsync_get_attachment($story, $kc_url, $index = 0)
  * @return int|null $attachment_id Attachment ID or null if no attachment found
  * @since 0.7.0
  */
-function kcsync_handle_attachment($story, $kc_url)
+function kcsync_handle_attachment($story, $kc_url, $attachment)
 {
-  // Getting the attachment
-  $attachment = kcsync_get_attachment($story, $kc_url);
   if (empty($attachment)) {
+    error_log("Klaro Cards Sync: No attachment found");
     return null;
   }
 

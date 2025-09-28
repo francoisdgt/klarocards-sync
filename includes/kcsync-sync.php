@@ -245,14 +245,17 @@ function kcsync_update_existing_post($board_story, $wp_post, $config, $parsedown
     return false;
   }
 
-  //Check if update is needed
-  $update_needed = kcsync_check_post_update($story, $wp_post, $config);
+  // Getting the attachment needed for the update check
+  $story_attachment = kcsync_get_attachment($story, $config['kc_url']);
+
+  // Check if update is needed
+  $update_needed = kcsync_check_post_update($story, $wp_post, $story_attachment);
   if (!$update_needed) {
     return false;
   }
 
   // Handle attachments test
-  $attachment_id = kcsync_handle_attachment($story, $config['kc_url']);
+  $attachment_id = kcsync_handle_attachment($story, $config['kc_url'], $story_attachment);
   error_log("Klaro Cards Sync: Attachment ID: $attachment_id");
 
   // Build updated content
@@ -496,51 +499,6 @@ function kcsync_get_default_category()
   }
 
   return $default_category;
-}
-
-/**
- * Creates a Gutenberg image block (alternative method)
- *
- * @param int $attachment_id Attachment ID
- * @param string $alt_text Alt text for the image
- * @return string Gutenberg block HTML
- * @since 0.7.0
- */
-function kcsync_create_image_block($attachment_id, $alt_text = '')
-{
-  if (empty($attachment_id)) {
-    return '';
-  }
-
-  $image_url = wp_get_attachment_url($attachment_id);
-  if (!$image_url) {
-    return '';
-  }
-
-  // Méthode 1 : Bloc Gutenberg simple
-  $block_html = '<!-- wp:image -->';
-  $block_html .= '<figure class="wp-block-image">';
-  $block_html .= '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($alt_text) . '" />';
-  $block_html .= '</figure>';
-  $block_html .= '<!-- /wp:image -->';
-
-  return $block_html;
-}
-
-/**
- * Creates a gallery shortcode (WordPress native)
- *
- * @param int $attachment_id Attachment ID
- * @return string Gallery shortcode
- * @since 0.7.0
- */
-function kcsync_create_gallery_shortcode($attachment_id)
-{
-  if (empty($attachment_id)) {
-    return '';
-  }
-
-  return '[gallery ids="' . intval($attachment_id) . '"]';
 }
 
 /**
