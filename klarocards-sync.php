@@ -35,7 +35,8 @@ function kcsync_activate()
     'Formation',
     'Blog',
     'Projet',
-    'Création'
+    'Création',
+    'Service'
   ];
   wp_create_categories($categories);
 }
