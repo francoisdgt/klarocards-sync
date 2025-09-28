@@ -311,7 +311,9 @@ function kcsync_prepare_new_post($board_story, $config, $parsedown)
     return false;
   }
 
-  $attachment_id = kcsync_handle_attachment($story, $config['kc_url']);
+  $story_attachment = kcsync_get_attachment($story, $config['kc_url']);
+
+  $attachment_id = kcsync_handle_attachment($story, $config['kc_url'], $story_attachment);
 
   // Build post content
   $post_content = kcsync_build_post_content($story, $attachment_id, $parsedown);
@@ -419,12 +421,12 @@ function kcsync_create_new_posts($new_posts)
 
     $created_posts[] = array(
       'post_id' => $post_id,
-      'story_id' => $post_data['meta_input']['story_id'],
+      'story_id' => $post_data['post_data']['meta_input']['story_id'],
       'update_thumbnail_result' => $update_thumbnail_result,
       'action' => 'created'
     );
 
-    error_log("Klaro Cards Sync: Nouveau post {$post_id} créé pour story {$post_data['meta_input']['story_id']}");
+    error_log("Klaro Cards Sync: Nouveau post {$post_id} créé pour story {$post_data['post_data']['meta_input']['story_id']}");
   }
 
   error_log("Klaro Cards Sync: Création terminée - " . count($created_posts) . " nouveaux posts créés");
@@ -476,7 +478,13 @@ function kcsync_get_category_by_card_kind($card_kind)
     return kcsync_get_default_category();
   }
 
-  $allowed_categories = array('Projets', 'Blog', 'Ateliers', 'Services');
+  $allowed_categories = array(
+    'Formation',
+    'Blog',
+    'Projet',
+    'Création',
+    'Service'
+  );
   if (!in_array($category->name, $allowed_categories)) {
     error_log("Klaro Cards Sync: category not allowed");
     return kcsync_get_default_category();

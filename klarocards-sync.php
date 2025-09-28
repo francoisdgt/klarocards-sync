@@ -31,7 +31,12 @@ require_once plugin_dir_path(__FILE__) . 'includes/kcsync-handle-attachments.php
 function kcsync_activate()
 {
   // Create categories if they don't exist
-  $categories = ['Projets', 'Blog', 'Ateliers', 'Services'];
+  $categories = [
+    'Formation',
+    'Blog',
+    'Projet',
+    'Création'
+  ];
   wp_create_categories($categories);
 }
 
