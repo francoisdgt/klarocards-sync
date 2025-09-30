@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Klaro Cards API client
  *
@@ -19,7 +20,8 @@ if (!defined('ABSPATH')) exit;
  * @param int $retry_count Number of attempts already made
  * @return array|WP_Error API data or error
  */
-function kcsync_api_call($url, $api_token, $retry_count = 0) {
+function kcsync_api_call($url, $api_token, $retry_count = 0)
+{
 	// Timeout and retry configuration
 	$max_retries = 3;
 	$base_timeout = 20; // Base timeout in seconds
@@ -33,7 +35,7 @@ function kcsync_api_call($url, $api_token, $retry_count = 0) {
 		],
 		'timeout' => $timeout,
 		'redirection' => 3,
-		'user-agent' => 'klarocards-sync/0.7.0; ' . home_url(),
+		'user-agent' => 'klarocards-sync/0.7.2; ' . home_url(),
 	]);
 
 	if (is_wp_error($response)) {

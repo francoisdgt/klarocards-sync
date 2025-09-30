@@ -158,9 +158,19 @@ function kcsync_associate_attachment_with_post($attachment_id, $post_id)
  */
 function kcsync_update_post_thumbnail($attachment_id, $post_id)
 {
-  if (is_null($attachment_id) || is_null($post_id)) {
+  error_log("Klaro Cards Sync: updating post thumbnail");
+  if (is_null($post_id)) {
     return false;
   }
+
+  // Deleting post thumbnail if no attachment
+  if (is_null($attachment_id)) {
+    error_log("Klaro Cards Sync: no attachment so we remove thumbnail");
+    delete_post_thumbnail($post_id);
+    return true;
+  }
+
+  error_log("Klaro Cards Sync: attachment found");
 
   // Set as featured image (thumbnail)
   $post_meta_id = set_post_thumbnail($post_id, $attachment_id);

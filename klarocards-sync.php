@@ -2,7 +2,7 @@
 /*
  * Plugin Name: Klaro Cards Sync
  * Description: Plugin pour synchroniser les cartes Klaro Cards avec WordPress.
- * Version: 0.7.1
+ * Version: 0.7.2
  * License: GPL v2 or later
  * Author: François Dangotte, Hugo Torres
  * Requires at least: 5.0
@@ -57,7 +57,7 @@ function kcsync_enqueue_admin_scripts($hook)
     'kcsync_sync_stories',
     plugins_url('/assets/js/kcsync-sync-stories.js', __FILE__),
     array('jquery'), // Dependencies
-    '0.7.1', // Script version
+    '0.7.2', // Script version
     true // Load in footer
   );
 

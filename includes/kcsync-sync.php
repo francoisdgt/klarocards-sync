@@ -279,9 +279,7 @@ function kcsync_update_existing_post($board_story, $wp_post, $config, $parsedown
     return false;
   }
 
-  if (!is_null($attachment_id)) {
-    kcsync_update_post_thumbnail($attachment_id, $wp_post->ID);
-  }
+  kcsync_update_post_thumbnail($attachment_id, $wp_post->ID);
 
   error_log("Klaro Cards Sync: Post {$wp_post->ID} mis à jour pour story {$board_story['id']}");
 
