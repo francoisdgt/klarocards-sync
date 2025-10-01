@@ -165,8 +165,11 @@ function kcsync_update_post_thumbnail($attachment_id, $post_id)
 
   // Deleting post thumbnail if no attachment
   if (is_null($attachment_id)) {
+    $thumbnail_id = get_post_thumbnail_id($post_id);
     error_log("Klaro Cards Sync: no attachment so we remove thumbnail");
     delete_post_thumbnail($post_id);
+    // Checking if the attachment is still used as a thumbnail
+    kcsync_remove_attachment_from_media($thumbnail_id);
     return true;
   }
 
@@ -177,4 +180,27 @@ function kcsync_update_post_thumbnail($attachment_id, $post_id)
 
   error_log("Klaro Cards Sync: Image à la une mise à jour avec succès, ID: $post_meta_id");
   return true;
+}
+
+/**
+ * Removes attachment from database when it's not used anymore
+ *
+ * @param int $attachment_id
+ * @return bool|int true if delete, or the number of posts linked to the attachment
+ */
+function kcsync_remove_attachment_from_media($attachment_id)
+{
+  $posts = get_posts(array(
+    'post_type' => 'any',
+    'meta_key' => '_thumbnail_id',
+    'meta_value' => $attachment_id
+  ));
+
+  if (count($posts) === 0) {
+    // removing from media
+    wp_delete_attachment($attachment_id);
+    return true;
+  }
+
+  return count($posts);
 }

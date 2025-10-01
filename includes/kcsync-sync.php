@@ -374,7 +374,9 @@ function kcsync_cleanup_orphaned_posts($story_id_to_post, $board_stories, $board
     if (!isset($board_story_ids[$story_id])) {
       // Story deleted from board → delete post
       if (current_user_can('delete_posts')) {
+        $thumbnail_id = get_post_thumbnail_id($post);
         $deleted = wp_delete_post($post->ID, true); // false = trash, true = force delete
+        kcsync_remove_attachment_from_media($thumbnail_id);
 
         if ($deleted) {
           $deleted_posts[] = array(
