@@ -99,7 +99,7 @@ function kcsync_get_sync_config()
   $kc_url = get_option('kcsync_api_url');
   $board_name = get_option('kcsync_board_name');
 
-  if (empty($api_token) || empty($kc_url) || empty($board_name)) {
+  if (empty($kc_url) || empty($board_name)) {
     return new WP_Error('config_missing', 'Configuration incomplète. Veuillez vérifier vos paramètres.');
   }
 

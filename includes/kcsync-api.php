@@ -31,7 +31,7 @@ function kcsync_api_call($url, $api_token, $retry_count = 0)
 	$response = wp_remote_get($url, [
 		'headers' => [
 			'Accept' => 'application/json',
-			'Authorization' => "Bearer $api_token",
+			// 'Authorization' => "Bearer $api_token",
 		],
 		'timeout' => $timeout,
 		'redirection' => 3,
